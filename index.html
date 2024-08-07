@@ -5,37 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>カードランダム抽出</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        #loginForm, #editForm {
-            display: none;
-            margin-top: 20px;
-        }
-        .input-row input {
-            width: 90%;
-            margin-bottom: 5px;
+        /* 既存のスタイル */
+        .notice {
+            background-color: #ffffd0;
+            border: 1px solid #e0e0a0;
+            padding: 10px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <h1>カードランダム抽出</h1>
     
+    <div class="notice">
+        <strong>注意:</strong> カードデータの変更はお使いのブラウザでしか記憶されません。
+    </div>
+
     <div id="editForm">
         <h2>カードデータ編集</h2>
         <div id="cardInputs"></div>
@@ -45,7 +30,7 @@
     
     <h2>設定</h2>
     <label for="extractCount">抽出数：</label>
-    <input type="number" id="extractCount" value="3" min="1">
+    <input type="number" id="extractCount" value="12" min="1">
     
     <button onclick="extractRandomCards()">ランダムに抽出</button>
     <button onclick="showLoginForm()">カードデータを編集</button>
