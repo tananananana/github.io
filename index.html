@@ -131,33 +131,37 @@
             {name: "精霊契約", cost: 8, series: "極東"}
         ];
 
-        function loadCardData() {
-            const storedData = localStorage.getItem('cardData');
-            if (storedData) {
-                cardData = JSON.parse(storedData);
-            }
-            displayCardList();
+function loadCardData() {
+        const storedData = localStorage.getItem('cardData');
+        if (storedData) {
+            cardData = JSON.parse(storedData);
+        } else {
+            // 初期データがローカルストレージにない場合、デフォルトのcardDataを使用
+            localStorage.setItem('cardData', JSON.stringify(cardData));
         }
+        displayCardList();
+    }
 
-        function displayCardList() {
-            const tableHTML = `
-                <table>
+       function displayCardList() {
+        const tableHTML = `
+            <table>
+                <tr>
+                    <th>カード名</th>
+                    <th>コスト</th>
+                    <th>シリーズ</th>
+                </tr>
+                ${cardData.map(card => `
                     <tr>
-                        <th>カード名</th>
-                        <th>コスト</th>
-                        <th>シリーズ</th>
+                        <td>${card.name}</td>
+                        <td>${card.cost}</td>
+                        <td>${card.series}</td>
                     </tr>
-                    ${cardData.map(card => `
-                        <tr>
-                            <td>${card.name}</td>
-                            <td>${card.cost}</td>
-                            <td>${card.series}</td>
-                        </tr>
-                    `).join('')}
-                </table>
-            `;
-            document.getElementById('cardList').innerHTML = tableHTML;
-        }
+                `).join('')}
+            </table>
+        `;
+        document.getElementById('cardList').innerHTML = tableHTML;
+    }
+
 
         function extractRandomCards() {
             const extractCount = parseInt(document.getElementById('extractCount').value);
@@ -240,13 +244,13 @@
             cardData[index][field] = value;
         }
 
-        function saveCardData() {
-            localStorage.setItem('cardData', JSON.stringify(cardData));
-            alert('カードデータを保存しました。');
-            displayCardList();
-        }
+            function saveCardData() {
+        localStorage.setItem('cardData', JSON.stringify(cardData));
+        alert('カードデータを保存しました。');
+        displayCardList();
+    }
 
-        window.onload = loadCardData;
+    window.onload = loadCardData;
     </script>
 </body>
 </html>
