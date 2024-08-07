@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>カードランダム抽出</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #loginForm, #editForm {
+            display: none;
+            margin-top: 20px;
+        }
+        .input-row input {
+            width: 90%;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>カードランダム抽出</h1>
+    
+    <div id="editForm">
+        <h2>カードデータ編集</h2>
+        <div id="cardInputs"></div>
+        <button onclick="addCardRow()">行を追加</button>
+        <button onclick="saveCardData()">保存</button>
+    </div>
+    
+    <h2>設定</h2>
+    <label for="extractCount">抽出数：</label>
+    <input type="number" id="extractCount" value="3" min="1">
+    
+    <button onclick="extractRandomCards()">ランダムに抽出</button>
+    <button onclick="showLoginForm()">カードデータを編集</button>
+    
+    <div id="loginForm">
+        <h3>ログイン</h3>
+        <input type="text" id="username" placeholder="ユーザーID">
+        <input type="password" id="password" placeholder="パスワード">
+        <button onclick="login()">ログイン</button>
+    </div>
+    
+    <h2>抽出結果</h2>
+    <div id="result"></div>
+
+    <h2>カード一覧</h2>
+    <div id="cardList"></div>
+
+    <script>
+        let cardData = [];
+
+        function loadCardData() {
+            const storedData = localStorage.getItem('cardData');
+            if (storedData) {
+                cardData = JSON.parse(storedData);
+            } else {
+                cardData = [
+                    {name: "ブルーアイズ・ホワイト・ドラゴン", cost: 8, series: "遊戯王"},
+                    {name: "ダーク・マジシャン", cost: 7, series: "遊戯王"},
+                    {name: "エクゾディア", cost: 1, series: "遊戯王"},
+                    {name: "シャーマンキング", cost: 4, series: "デュエル・マスターズ"},
+                    {name: "ブラックロータス", cost: 0, series: "マジック・ザ・ギャザリング"}
+                ];
+            }
+            displayCardList();
+        }
+
+        function displayCardList() {
+            const tableHTML = `
+                <table>
+                    <tr>
+                        <th>カード名</th>
+                        <th>コスト</th>
+                        <th>シリーズ</th>
+                    </tr>
+                    ${cardData.map(card => `
+                        <tr>
+                            <td>${card.name}</td>
+                            <td>${card.cost}</td>
+                            <td>${card.series}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
+            document.getElementById('cardList').innerHTML = tableHTML;
+        }
+
+        function extractRandomCards() {
+            const extractCount = parseInt(document.getElementById('extractCount').value);
+            const tempCards = [...cardData];
+            const result = [];
+            
+            for (let i = 0; i < extractCount && tempCards.length > 0; i++) {
+                const randomIndex = Math.floor(Math.random() * tempCards.length);
+                result.push(tempCards.splice(randomIndex, 1)[0]);
+            }
+
+            const tableHTML = `
+                <table>
+                    <tr>
+                        <th>カード名</th>
+                        <th>コスト</th>
+                        <th>シリーズ</th>
+                    </tr>
+                    ${result.map(card => `
+                        <tr>
+                            <td>${card.name}</td>
+                            <td>${card.cost}</td>
+                            <td>${card.series}</td>
+                        </tr>
+                    `).join('')}
+                </table>
+            `;
+
+            document.getElementById('result').innerHTML = tableHTML;
+        }
+
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === 'hato' && password === 'udon') {
+                document.getElementById('editForm').style.display = 'block';
+                document.getElementById('loginForm').style.display = 'none';
+                populateCardInputs();
+            } else {
+                alert('ユーザーIDまたはパスワードが正しくありません。');
+            }
+        }
+
+        function populateCardInputs() {
+            const cardInputs = document.getElementById('cardInputs');
+            cardInputs.innerHTML = '';
+            cardData.forEach((card, index) => {
+                cardInputs.innerHTML += createCardInputRow(index, card);
+            });
+        }
+
+        function createCardInputRow(index, card = {name: '', cost: '', series: ''}) {
+            return `
+                <div class="input-row" id="card-row-${index}">
+                    <input type="text" placeholder="カード名" value="${card.name}" oninput="updateCardData(${index}, 'name', this.value)">
+                    <input type="number" placeholder="コスト" value="${card.cost}" oninput="updateCardData(${index}, 'cost', this.value)">
+                    <input type="text" placeholder="シリーズ" value="${card.series}" oninput="updateCardData(${index}, 'series', this.value)">
+                    <button onclick="removeCardRow(${index})">削除</button>
+                </div>
+            `;
+        }
+
+        function addCardRow() {
+            const cardInputs = document.getElementById('cardInputs');
+            const newIndex = cardData.length;
+            cardInputs.innerHTML += createCardInputRow(newIndex);
+            cardData.push({name: '', cost: '', series: ''});
+        }
+
+        function removeCardRow(index) {
+            document.getElementById(`card-row-${index}`).remove();
+            cardData.splice(index, 1);
+        }
+
+        function updateCardData(index, field, value) {
+            cardData[index][field] = value;
+        }
+
+        function saveCardData() {
+            localStorage.setItem('cardData', JSON.stringify(cardData));
+            alert('カードデータを保存しました。');
+            displayCardList();
+        }
+
+        window.onload = loadCardData;
+    </script>
+</body>
+</html>
