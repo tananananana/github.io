@@ -4,241 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>カードランダム抽出</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        #loginForm, #editForm {
-            display: none;
-            margin-top: 20px;
-        }
-        .input-row input {
-            width: 90%;
-            margin-bottom: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <h1>カードランダム抽出</h1>
+    <header>
+        <h1>カードランダム抽出</h1>
+    </header>
     
-    <div id="editForm">
-        <h2>カードデータ編集</h2>
-        <div id="cardInputs"></div>
-        <button onclick="addCardRow()">行を追加</button>
-        <button onclick="saveCardData()">保存</button>
-    </div>
-    
-    <h2>設定</h2>
-    <label for="extractCount">抽出数：</label>
-    <input type="number" id="extractCount" value="12" min="1">
-    
-    <button onclick="extractRandomCards()">ランダムに抽出</button>
-    <button onclick="showLoginForm()">カードデータを編集</button>
-    
-    <div id="loginForm">
-        <h3>ログイン</h3>
-        <input type="text" id="username" placeholder="ユーザーID">
-        <input type="password" id="password" placeholder="パスワード">
-        <button onclick="login()">ログイン</button>
-    </div>
-    
-    <h2>抽出結果</h2>
-    <div id="result"></div>
+    <main>
+        <section id="extraction">
+            <h2>抽出設定</h2>
+            <form id="extractForm">
+                <label for="extractCount">抽出数：</label>
+                <input type="number" id="extractCount" min="1" value="1">
+                <button type="submit">ランダムに抽出</button>
+            </form>
+        </section>
 
-    <h2>カード一覧</h2>
-    <div id="cardList"></div>
+        <section id="results">
+            <h2>抽出結果</h2>
+            <ul id="result"></ul>
+        </section>
 
-    <script>
-        let cardData = [];
+        <section id="cards">
+            <h2>カード一覧</h2>
+            <ul id="cardList"></ul>
+        </section>
+    </main>
 
-        function loadCardData() {
-            const storedData = localStorage.getItem('cardData');
-            if (storedData) {
-                cardData = JSON.parse(storedData);
-            } else {
-            cardData = [
-            {name: "隠れ家", cost: 2, series: "基本"},
-            {name: "寄付", cost: 2, series: "基本"},
-            {name: "城壁", cost: 2, series: "基本"},
-            {name: "斥候", cost: 2, series: "基本"},
-            {name: "願いの泉", cost: 2, series: "基本"},
-            {name: "早馬", cost: 2, series: "基本"},
-            {name: "家守の掟書", cost: 2, series: "極東"},
-            {name: "お金好きの妖精", cost: 2, series: "極東"},
-            {name: "楽市楽座", cost: 2, series: "極東"},
-            {name: "埋もれた財宝", cost: 3, series: "基本"},
-            {name: "交易船", cost: 3, series: "基本"},
-            {name: "御用商人", cost: 3, series: "基本"},
-            {name: "都市開発", cost: 3, series: "基本"},
-            {name: "破城槌", cost: 3, series: "基本"},
-            {name: "星読みの魔女", cost: 3, series: "基本"},
-            {name: "魔法の護符", cost: 3, series: "基本"},
-            {name: "よろず屋", cost: 3, series: "基本"},
-            {name: "区画整理", cost: 3, series: "極東"},
-            {name: "クノイチ", cost: 3, series: "極東"},
-            {name: "高価な美術品", cost: 3, series: "極東"},
-            {name: "伝書鳩", cost: 3, series: "極東"},
-            {name: "密偵", cost: 3, series: "極東"},
-            {name: "弓兵隊", cost: 3, series: "極東"},
-            {name: "追い立てられた魔獣", cost: 4, series: "基本"},
-            {name: "お付の侍女", cost: 4, series: "基本"},
-            {name: "開墾令", cost: 4, series: "基本"},
-            {name: "銀行", cost: 4, series: "基本"},
-            {name: "図書館", cost: 4, series: "基本"},
-            {name: "のみの市", cost: 4, series: "基本"},
-            {name: "補給部隊", cost: 4, series: "基本"},
-            {name: "歩兵大隊", cost: 4, series: "基本"},
-            {name: "鬼族の戦士", cost: 4, series: "極東"},
-            {name: "課税", cost: 4, series: "極東"},
-            {name: "鉱山都市", cost: 4, series: "極東"},
-            {name: "サムライ", cost: 4, series: "極東"},
-            {name: "港町", cost: 4, series: "極東"},
-            {name: "見習い魔女", cost: 4, series: "極東"},
-            {name: "割り符", cost: 4, series: "極東"},
-            {name: "皇室領", cost: 5, series: "基本"},
-            {name: "近衛騎士団", cost: 5, series: "基本"},
-            {name: "呪詛の魔女", cost: 5, series: "基本"},
-            {name: "舞踏会", cost: 5, series: "基本"},
-            {name: "冒険者", cost: 5, series: "基本"},
-            {name: "魅了術の魔女", cost: 5, series: "基本"},
-            {name: "錬金術師", cost: 5, series: "基本"},
-            {name: "降霊師", cost: 5, series: "極東"},
-            {name: "騎馬武者", cost: 5, series: "極東"},
-            {name: "結盟", cost: 5, series: "極東"},
-            {name: "噂好きの公爵夫人", cost: 6, series: "基本"},
-            {name: "辺境伯", cost: 6, series: "基本"},
-            {name: "公正な取引", cost: 6, series: "極東"},
-            {name: "貿易商人", cost: 6, series: "極東"},
-            {name: "大名", cost: 7, series: "極東"}
-            {name: "精霊契約", cost: 8, series: "極東"}
-                ];
-            }
-            displayCardList();
-        }
-
-        function displayCardList() {
-            const tableHTML = `
-                <table>
-                    <tr>
-                        <th>カード名</th>
-                        <th>コスト</th>
-                        <th>シリーズ</th>
-                    </tr>
-                    ${cardData.map(card => `
-                        <tr>
-                            <td>${card.name}</td>
-                            <td>${card.cost}</td>
-                            <td>${card.series}</td>
-                        </tr>
-                    `).join('')}
-                </table>
-            `;
-            document.getElementById('cardList').innerHTML = tableHTML;
-        }
-
-        function extractRandomCards() {
-            const extractCount = parseInt(document.getElementById('extractCount').value);
-            const tempCards = [...cardData];
-            const result = [];
-            
-            for (let i = 0; i < extractCount && tempCards.length > 0; i++) {
-                const randomIndex = Math.floor(Math.random() * tempCards.length);
-                result.push(tempCards.splice(randomIndex, 1)[0]);
-            }
-
-            const tableHTML = `
-                <table>
-                    <tr>
-                        <th>カード名</th>
-                        <th>コスト</th>
-                        <th>シリーズ</th>
-                    </tr>
-                    ${result.map(card => `
-                        <tr>
-                            <td>${card.name}</td>
-                            <td>${card.cost}</td>
-                            <td>${card.series}</td>
-                        </tr>
-                    `).join('')}
-                </table>
-            `;
-
-            document.getElementById('result').innerHTML = tableHTML;
-        }
-
-        function showLoginForm() {
-            document.getElementById('loginForm').style.display = 'block';
-        }
-
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            if (username === 'hato' && password === 'udon') {
-                document.getElementById('editForm').style.display = 'block';
-                document.getElementById('loginForm').style.display = 'none';
-                populateCardInputs();
-            } else {
-                alert('ユーザーIDまたはパスワードが正しくありません。');
-            }
-        }
-
-        function populateCardInputs() {
-            const cardInputs = document.getElementById('cardInputs');
-            cardInputs.innerHTML = '';
-            cardData.forEach((card, index) => {
-                cardInputs.innerHTML += createCardInputRow(index, card);
-            });
-        }
-
-        function createCardInputRow(index, card = {name: '', cost: '', series: ''}) {
-            return `
-                <div class="input-row" id="card-row-${index}">
-                    <input type="text" placeholder="カード名" value="${card.name}" oninput="updateCardData(${index}, 'name', this.value)">
-                    <input type="number" placeholder="コスト" value="${card.cost}" oninput="updateCardData(${index}, 'cost', this.value)">
-                    <input type="text" placeholder="シリーズ" value="${card.series}" oninput="updateCardData(${index}, 'series', this.value)">
-                    <button onclick="removeCardRow(${index})">削除</button>
-                </div>
-            `;
-        }
-
-        function addCardRow() {
-            const cardInputs = document.getElementById('cardInputs');
-            const newIndex = cardData.length;
-            cardInputs.innerHTML += createCardInputRow(newIndex);
-            cardData.push({name: '', cost: '', series: ''});
-        }
-
-        function removeCardRow(index) {
-            document.getElementById(`card-row-${index}`).remove();
-            cardData.splice(index, 1);
-        }
-
-        function updateCardData(index, field, value) {
-            cardData[index][field] = value;
-        }
-
-        function saveCardData() {
-            localStorage.setItem('cardData', JSON.stringify(cardData));
-            alert('カードデータを保存しました。');
-            displayCardList();
-        }
-
-        window.onload = loadCardData;
-    </script>
+    <script src="js/script.js"></script>
 </body>
 </html>
