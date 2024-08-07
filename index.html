@@ -31,21 +31,11 @@
             width: 90%;
             margin-bottom: 5px;
         }
-        .notice {
-            background-color: #ffffd0;
-            border: 1px solid #e0e0a0;
-            padding: 10px;
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 <body>
     <h1>カードランダム抽出</h1>
     
-    <div class="notice">
-        <strong>注意:</strong> カードデータの変更はお使いのブラウザでしか記憶されません。
-    </div>
-
     <div id="editForm">
         <h2>カードデータ編集</h2>
         <div id="cardInputs"></div>
@@ -55,7 +45,7 @@
     
     <h2>設定</h2>
     <label for="extractCount">抽出数：</label>
-    <input type="number" id="extractCount" value="13" min="1">
+    <input type="number" id="extractCount" value="3" min="1">
     
     <button onclick="extractRandomCards()">ランダムに抽出</button>
     <button onclick="showLoginForm()">カードデータを編集</button>
@@ -74,14 +64,21 @@
     <div id="cardList"></div>
 
     <script>
-        let cardData = [
+        let cardData = [];
+
+        function loadCardData() {
+            const storedData = localStorage.getItem('cardData');
+            if (storedData) {
+                cardData = JSON.parse(storedData);
+            } else {
+                cardData = [
             {name: "隠れ家", cost: 2, series: "基本"},
             {name: "寄付", cost: 2, series: "基本"},
             {name: "城壁", cost: 2, series: "基本"},
             {name: "斥候", cost: 2, series: "基本"},
             {name: "願いの泉", cost: 2, series: "基本"},
             {name: "早馬", cost: 2, series: "基本"},
-            {name: "家守の精霊", cost: 2, series: "極東"},
+            {name: "家守の掟書", cost: 2, series: "極東"},
             {name: "お金好きの妖精", cost: 2, series: "極東"},
             {name: "楽市楽座", cost: 2, series: "極東"},
             {name: "埋もれた財宝", cost: 3, series: "基本"},
@@ -129,15 +126,7 @@
             {name: "貿易商人", cost: 6, series: "極東"},
             {name: "大名", cost: 7, series: "極東"}
             {name: "精霊契約", cost: 8, series: "極東"}
-        ];
-
-        function loadCardData() {
-            const storedData = localStorage.getItem('cardData');
-            if (storedData) {
-                cardData = JSON.parse(storedData);
-            } else {
-                // 初期データがローカルストレージにない場合、デフォルトのcardDataを使用
-                localStorage.setItem('cardData', JSON.stringify(cardData));
+                ];
             }
             displayCardList();
         }
