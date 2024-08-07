@@ -43,7 +43,7 @@
     <h1>カードランダム抽出</h1>
     
     <div class="notice">
-        <strong>注意:</strong> カードデータの変更はお使いのブラウザでしか記憶されません。
+        <strong>注意:</strong> カードデータの変更はお使いのブラウザでしか記憶されません。ID:hato PW:udon　
     </div>
 
     <div id="editForm">
@@ -161,37 +161,38 @@
             `;
             document.getElementById('cardList').innerHTML = tableHTML;
         }
+function extractRandomCards() {
+    const extractCount = parseInt(document.getElementById('extractCount').value);
+    const tempCards = [...cardData];
+    const result = [];
+    
+    for (let i = 0; i < extractCount && tempCards.length > 0; i++) {
+        const randomIndex = Math.floor(Math.random() * tempCards.length);
+        result.push(tempCards.splice(randomIndex, 1)[0]);
+    }
 
-        function extractRandomCards() {
-            const extractCount = parseInt(document.getElementById('extractCount').value);
-            const tempCards = [...cardData];
-            const result = [];
-            
-            for (let i = 0; i < extractCount && tempCards.length > 0; i++) {
-                const randomIndex = Math.floor(Math.random() * tempCards.length);
-                result.push(tempCards.splice(randomIndex, 1)[0]);
-            }
+    // コストの昇順でソート
+    result.sort((a, b) => a.cost - b.cost);
 
-            const tableHTML = `
-                <table>
-                    <tr>
-                        <th>カード名</th>
-                        <th>コスト</th>
-                        <th>シリーズ</th>
-                    </tr>
-                    ${result.map(card => `
-                        <tr>
-                            <td>${card.name}</td>
-                            <td>${card.cost}</td>
-                            <td>${card.series}</td>
-                        </tr>
-                    `).join('')}
-                </table>
-            `;
+    const tableHTML = `
+        <table>
+            <tr>
+                <th>カード名</th>
+                <th>コスト</th>
+                <th>シリーズ</th>
+            </tr>
+            ${result.map(card => `
+                <tr>
+                    <td>${card.name}</td>
+                    <td>${card.cost}</td>
+                    <td>${card.series}</td>
+                </tr>
+            `).join('')}
+        </table>
+    `;
 
-            document.getElementById('result').innerHTML = tableHTML;
-        }
-
+    document.getElementById('result').innerHTML = tableHTML;
+}
         function showLoginForm() {
             document.getElementById('loginForm').style.display = 'block';
         }
